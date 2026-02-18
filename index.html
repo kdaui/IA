@@ -169,52 +169,61 @@
     </footer>
 
     <script>
-        const UPLOADER_ID = 'noice_noice'; 
+const SCREEN_NAME = 'kdaui'; 
+const HANDLE = 'noice_noice';
 
-        async function getArchiveData() {
-            const container = document.getElementById('ia-container');
-            const status = document.getElementById('status');
+async function getArchiveData() {
+    const container = document.getElementById('ia-container');
+    const status = document.getElementById('status');
 
-            const query = `uploader:"${UPLOADER_ID}"`;
-            const fields = `identifier,title,mediatype,publicdate`;
-            const url = `https://archive.org/advancedsearch.php?q=${query}&fl[]=${fields}&sort[]=publicdate+desc&output=json`;
+    const query = `(uploader:"${SCREEN_NAME}" OR creator:"${SCREEN_NAME}" OR uploader:"${HANDLE}" OR creator:"${HANDLE}")`;
+    
+    const fields = `identifier,title,mediatype,publicdate,uploader`; // Added uploader here for debugging
+    const url = `https://archive.org/advancedsearch.php?q=${query}&fl[]=${fields}&sort[]=publicdate+desc&output=json`;
 
-            try {
-                const response = await fetch(url);
-                const data = await response.json();
-                const items = data.response.docs;
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+        const items = data.response.docs;
 
-                status.style.display = 'none';
-
-                if (items.length === 0) {
-                    status.innerHTML = "NO PUBLIC UPLOADS DETECTED FOR: " + UPLOADER_ID;
-                    status.style.display = 'block';
-                    return;
-                }
-
-                items.forEach(item => {
-                    const card = document.createElement('div');
-                    card.className = 'ia-card';
-                    
-                    const thumb = `https://archive.org/services/img/${item.identifier}`;
-                    const link = `https://archive.org/details/${item.identifier}`;
-                    
-                    card.innerHTML = `
-                        <img src="${thumb}" class="ia-thumb" onerror="this.src='https://archive.org/images/glogo.png'">
-                        <div class="ia-meta">${item.mediatype.toUpperCase()} // ${item.publicdate ? item.publicdate.split('T')[0] : 'DATE_NA'}</div>
-                        <h3 class="ia-title">${item.title}</h3>
-                        <a href="${link}" target="_blank" class="ia-btn">VIEW_ON_IA</a>
-                    `;
-                    container.appendChild(card);
-                });
-
-            } catch (err) {
-                status.innerHTML = "SYSTEM_ERROR: CONNECTION_FAILED";
-                status.style.color = "var(--accent-red)";
-            }
+        if (!items || items.length === 0) {
+            status.innerHTML = `NO PUBLIC DATA FOUND.<br><br>
+                <small style="color:var(--text-secondary)">
+                Tried searching for: ${SCREEN_NAME} and ${HANDLE}<br>
+                Make sure your uploads are set to 'Public' on archive.org.
+                </small>`;
+            return;
         }
 
-        window.onload = getArchiveData;
+        status.style.display = 'none';
+        container.innerHTML = ''; 
+
+        items.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'ia-card';
+            
+            const thumb = `https://archive.org/services/img/${item.identifier}`;
+            const link = `https://archive.org/details/${item.identifier}`;
+            
+            // LOGS
+            console.log(`Item "${item.title}" is uploaded by: ${item.uploader}`);
+
+            card.innerHTML = `
+                <img src="${thumb}" class="ia-thumb" onerror="this.src='https://archive.org/images/glogo.png'">
+                <div class="ia-meta">${item.mediatype.toUpperCase()} // ${item.publicdate ? item.publicdate.split('T')[0] : 'DATE_NA'}</div>
+                <h3 class="ia-title">${item.title}</h3>
+                <a href="${link}" target="_blank" class="ia-btn">VIEW_ON_IA</a>
+            `;
+            container.appendChild(card);
+        });
+
+    } catch (err) {
+        status.innerHTML = "SYSTEM_ERROR: CONNECTION_FAILED";
+        status.style.color = "var(--accent-red)";
+    }
+}
+
+window.onload = getArchiveData;
     </script>
 </body>
 </html>
