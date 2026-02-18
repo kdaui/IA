@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE KDAUI ARCHIVES</title>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-dark: #0A0F1C;
+            --secondary-dark: #141928;
+            --tertiary-dark: #1C2333;
+            --primary-blue: #1B3A5F;
+            --secondary-blue: #2C4E7C;
+            --accent-blue: #3D6299;
+            --light-accent: #5E8ABF;
+            --text-primary: #B8C5D6;
+            --text-secondary: #8A9BB3;
+            --accent-red: #8B2635;
+            --border-color: #2A3F5F;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Share Tech Mono', monospace;
+            background-color: var(--primary-dark);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            position: relative;
+            min-height: 100vh;
+        }
+
+        .background-pattern {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: 
+                radial-gradient(circle at 20% 30%, rgba(61, 98, 153, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(61, 98, 153, 0.05) 0%, transparent 50%),
+                url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%233D6299' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            z-index: -1;
+        }
+
+        .site-container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 60px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .site-header {
+            text-align: center;
+            margin-bottom: 60px;
+            padding: 40px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .site-title {
+            font-size: 3rem;
+            color: var(--light-accent);
+            margin-bottom: 30px;
+            text-shadow: 0 0 15px rgba(94, 138, 191, 0.3);
+            letter-spacing: 2px;
+        }
+
+        .nav-link {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: rgba(28, 35, 51, 0.7);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            min-width: 120px;
+        }
+
+        .nav-link:hover {
+            background-color: rgba(61, 98, 153, 0.3);
+            color: var(--text-primary);
+            transform: translateY(-2px);
+        }
+
+        /* ARCHIVE VIEWER SPECIFIC STYLES */
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .ia-card {
+            background-color: rgba(28, 35, 51, 0.5);
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease;
+        }
+
+        .ia-card:hover {
+            border-color: var(--light-accent);
+            box-shadow: 0 0 15px rgba(94, 138, 191, 0.1);
+            transform: translateY(-5px);
+        }
+
+        .ia-thumb {
+            width: 100%;
+            aspect-ratio: 16/9;
+            object-fit: cover;
+            border: 1px solid var(--border-color);
+            margin-bottom: 15px;
+            background: var(--primary-dark);
+        }
+
+        .ia-type {
+            font-size: 0.8rem;
+            color: var(--accent-blue);
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .ia-title {
+            font-size: 1.2rem;
+            color: var(--text-primary);
+            margin-bottom: 15px;
+            flex-grow: 1;
+        }
+
+        .ia-btn {
+            display: block;
+            text-align: center;
+            padding: 10px;
+            background: var(--tertiary-dark);
+            border: 1px solid var(--border-color);
+            color: var(--light-accent);
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .ia-btn:hover {
+            background: var(--accent-blue);
+            color: white;
+        }
+
+        #loading-status {
+            text-align: center;
+            padding: 50px;
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+        }
+
+        @media (max-width: 768px) {
+            .site-container { padding: 20px; }
+            .site-title { font-size: 2rem; }
+            .content-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="background-pattern"></div>
+
+    <div class="site-container">
+        <header class="site-header">
+            <h1 class="site-title">THE KDAUI ARCHIVES</h1>
+            <nav class="main-nav">
+                <a href="../" class="nav-link">← RETURN_TO_ROOT</a>
+                <a href="#" class="nav-link active">ARCHIVE_INDEX</a>
+                <a href="https://archive.org/details/@noice_noice" target="_blank" class="nav-link">IA_PROFILE</a>
+            </nav>
+        </header>
+
+        <main class="main-content">
+            <div id="loading-status">INITIALIZING CONNECTION TO INTERNET ARCHIVE...</div>
+            <div id="ia-container" class="content-grid">
+                <!-- Data shows here -->
+            </div>
+        </main>
+
+        <footer class="site-footer">
+            <p>DATA REPRODUCTION OF ARCHIVE.ORG/DETAILS/@KDAUI</p>
+        </footer>
+    </div>
+
+    <script>
+        const IA_USER = 'noice_noice'; 
+
+        async function fetchArchive() {
+            const container = document.getElementById('ia-container');
+            const status = document.getElementById('loading-status');
+            
+            // Querying for items where uploader OR creator is the user
+            const url = `https://archive.org/advancedsearch.php?q=uploader%3A(${IA_USER})+OR+creator%3A(${IA_USER})&fl[]=identifier,title,mediatype,publicdate&sort[]=publicdate+desc&output=json`;
+
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                const items = data.response.docs;
+
+                status.style.display = 'none';
+
+                if (items.length === 0) {
+                    status.innerText = "NO PUBLIC DATA FOUND.";
+                    status.style.display = 'block';
+                    return;
+                }
+
+                items.forEach(item => {
+                    const card = document.createElement('div');
+                    card.className = 'ia-card';
+                    
+                    // Show the thumbnail URL
+                    const thumb = `https://archive.org/services/img/${item.identifier}`;
+                    const link = `https://archive.org/details/${item.identifier}`;
+                    
+                    card.innerHTML = `
+                        <img src="${thumb}" class="ia-thumb" alt="Preview" onerror="this.src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII='">
+                        <div class="ia-type">${item.mediatype} // ${item.publicdate ? item.publicdate.split('T')[0] : 'DATE_UNKNOWN'}</div>
+                        <h3 class="ia-title">${item.title}</h3>
+                        <a href="${link}" target="_blank" class="ia-btn">ACCESS_FILE</a>
+                    `;
+                    container.appendChild(card);
+                });
+
+            } catch (err) {
+                console.error(err);
+                status.innerText = "CONNECTION_ERROR: ARCHIVE.ORG API UNREACHABLE";
+                status.style.color = "var(--accent-red)";
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', fetchArchive);
+    </script>
+</body>
+</html>
