@@ -73,8 +73,6 @@
             color: var(--text-secondary);
             text-decoration: none;
             transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
             min-width: 120px;
         }
 
@@ -84,12 +82,10 @@
             transform: translateY(-2px);
         }
 
-        /* ARCHIVE VIEWER SPECIFIC STYLES */
         .content-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
             gap: 30px;
-            margin-top: 40px;
         }
 
         .ia-card {
@@ -98,65 +94,54 @@
             padding: 20px;
             display: flex;
             flex-direction: column;
-            transition: all 0.3s ease;
+            transition: 0.3s;
         }
 
         .ia-card:hover {
             border-color: var(--light-accent);
-            box-shadow: 0 0 15px rgba(94, 138, 191, 0.1);
             transform: translateY(-5px);
         }
 
         .ia-thumb {
             width: 100%;
-            aspect-ratio: 16/9;
-            object-fit: cover;
+            aspect-ratio: 1 / 1;
+            object-fit: contain;
+            background: #000;
             border: 1px solid var(--border-color);
             margin-bottom: 15px;
-            background: var(--primary-dark);
         }
 
-        .ia-type {
+        .ia-meta {
             font-size: 0.8rem;
             color: var(--accent-blue);
-            text-transform: uppercase;
             margin-bottom: 5px;
         }
 
         .ia-title {
-            font-size: 1.2rem;
-            color: var(--text-primary);
+            font-size: 1.1rem;
             margin-bottom: 15px;
             flex-grow: 1;
         }
 
         .ia-btn {
-            display: block;
-            text-align: center;
-            padding: 10px;
             background: var(--tertiary-dark);
             border: 1px solid var(--border-color);
             color: var(--light-accent);
+            padding: 10px;
+            text-align: center;
             text-decoration: none;
-            font-size: 0.9rem;
         }
 
         .ia-btn:hover {
             background: var(--accent-blue);
-            color: white;
+            color: #fff;
         }
 
-        #loading-status {
-            text-align: center;
-            padding: 50px;
-            font-size: 1.5rem;
-            color: var(--text-secondary);
-        }
+        #status { text-align: center; padding: 40px; color: var(--text-secondary); }
 
         @media (max-width: 768px) {
             .site-container { padding: 20px; }
             .site-title { font-size: 2rem; }
-            .content-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -166,35 +151,33 @@
 
     <div class="site-container">
         <header class="site-header">
-            <h1 class="site-title">THE KDAUI ARCHIVES</h1>
+            <h1 class="site-title">THE KDAUI ARCHIVE'S</h1>
             <nav class="main-nav">
-                <a href="../" class="nav-link">← RETURN_TO_ROOT</a>
-                <a href="#" class="nav-link active">ARCHIVE_INDEX</a>
-                <a href="https://archive.org/details/@noice_noice" target="_blank" class="nav-link">IA_PROFILE</a>
+                <a href="../" class="nav-link">BACK</a>
+                <a href="https://archive.org/details/@noice_noice" class="nav-link">PROFILE</a>
             </nav>
         </header>
 
-        <main class="main-content">
-            <div id="loading-status">INITIALIZING CONNECTION TO INTERNET ARCHIVE...</div>
-            <div id="ia-container" class="content-grid">
-                <!-- Data shows here -->
-            </div>
+        <main id="main-viewer">
+            <div id="status">CONNECTING TO DATABASE...</div>
+            <div id="ia-container" class="content-grid"></div>
         </main>
-
-        <footer class="site-footer">
-            <p>DATA REPRODUCTION OF ARCHIVE.ORG/DETAILS/@KDAUI</p>
-        </footer>
     </div>
 
-    <script>
-        const IA_USER = 'kdaui'; 
+    <footer>
+        <p>DATA REPRODUCTION OF @NOICE_NOICE</p>
+    </footer>
 
-        async function fetchArchive() {
+    <script>
+        const UPLOADER_ID = 'noice_noice'; 
+
+        async function getArchiveData() {
             const container = document.getElementById('ia-container');
-            const status = document.getElementById('loading-status');
-            
-            // Querying for items where uploader OR creator is the user
-            const url = `https://archive.org/advancedsearch.php?q=uploader%3A(${IA_USER})+OR+creator%3A(${IA_USER})&fl[]=identifier,title,mediatype,publicdate&sort[]=publicdate+desc&output=json`;
+            const status = document.getElementById('status');
+
+            const query = `uploader:"${UPLOADER_ID}"`;
+            const fields = `identifier,title,mediatype,publicdate`;
+            const url = `https://archive.org/advancedsearch.php?q=${query}&fl[]=${fields}&sort[]=publicdate+desc&output=json`;
 
             try {
                 const response = await fetch(url);
@@ -204,7 +187,7 @@
                 status.style.display = 'none';
 
                 if (items.length === 0) {
-                    status.innerText = "NO PUBLIC DATA FOUND.";
+                    status.innerHTML = "NO PUBLIC UPLOADS DETECTED FOR: " + UPLOADER_ID;
                     status.style.display = 'block';
                     return;
                 }
@@ -213,27 +196,25 @@
                     const card = document.createElement('div');
                     card.className = 'ia-card';
                     
-                    // Show the thumbnail URL
                     const thumb = `https://archive.org/services/img/${item.identifier}`;
                     const link = `https://archive.org/details/${item.identifier}`;
                     
                     card.innerHTML = `
-                        <img src="${thumb}" class="ia-thumb" alt="Preview" onerror="this.src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII='">
-                        <div class="ia-type">${item.mediatype} // ${item.publicdate ? item.publicdate.split('T')[0] : 'DATE_UNKNOWN'}</div>
+                        <img src="${thumb}" class="ia-thumb" onerror="this.src='https://archive.org/images/glogo.png'">
+                        <div class="ia-meta">${item.mediatype.toUpperCase()} // ${item.publicdate ? item.publicdate.split('T')[0] : 'DATE_NA'}</div>
                         <h3 class="ia-title">${item.title}</h3>
-                        <a href="${link}" target="_blank" class="ia-btn">ACCESS_FILE</a>
+                        <a href="${link}" target="_blank" class="ia-btn">VIEW_ON_IA</a>
                     `;
                     container.appendChild(card);
                 });
 
             } catch (err) {
-                console.error(err);
-                status.innerText = "CONNECTION_ERROR: ARCHIVE.ORG API UNREACHABLE";
+                status.innerHTML = "SYSTEM_ERROR: CONNECTION_FAILED";
                 status.style.color = "var(--accent-red)";
             }
         }
 
-        document.addEventListener('DOMContentLoaded', fetchArchive);
+        window.onload = getArchiveData;
     </script>
 </body>
 </html>
