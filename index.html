@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>THE KDAUI ARCHIVE'S</title>
+    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#5E8ABF" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -224,6 +228,17 @@ async function getArchiveData() {
 }
 
 window.onload = getArchiveData;
+    </script>
+    <footer class="site-footer">
+        <p>Last updated: <span class="last-updated"></span></p>
+    </footer>
+    <script>
+        document.querySelector('.last-updated').textContent = new Date().toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric' });
+    </script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/IA/sw.js').then(() => {});
+        }
     </script>
 </body>
 </html>
