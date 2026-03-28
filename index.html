@@ -147,6 +147,21 @@
             .site-container { padding: 20px; }
             .site-title { font-size: 2rem; }
         }
+
+        .site-footer {
+            display: flex;
+            justify-content: flex-end;
+            padding: 15px 20px;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            margin-top: 40px;
+        }
+
+        .site-footer .last-updated-date {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            opacity: 0.6;
+        }
     </style>
 </head>
 <body>
@@ -230,7 +245,7 @@ async function getArchiveData() {
 window.onload = getArchiveData;
     </script>
     <footer class="site-footer">
-        <p>Last updated: <span class="last-updated"></span></p>
+        <span class="last-updated-date">Last updated: <span class="last-updated"></span></span>
     </footer>
     <script>
         document.querySelector('.last-updated').textContent = new Date().toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric' });
